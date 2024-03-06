@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test variant for index page</title>
+</head>
+<body>
+    <h1>Log In</h1>
+    <div id="message"></div>
+    <p>
+        Input Login: <br />
+        <input id="userlogin" />
+    </p>
+    <p>
+        Input Password: <br />
+        <input id="userpassword"/>
+    </p>
+    <button onclick="send()">Submit</button>
+</body>
+<script>
+    function send(){
+        // забираємо дані
+        let login = document.getElementById("userlogin").value;
+        let password = document.getElementById("userpassword").value;
+
+        // надсилаємо запит
+        const response = await fetch("/hello", {
+        method: "POST",
+        headers: { "Accept": "application/json", "Content-Type":
+        "application/json" },
+
+        body: JSON.stringify({
+        name: userlogin,
+        age: userpassword
+            })
+        });
+        if (response.ok) {
+            const data = await response.json();
+            document.getElementById("message").textContent = data.message;
+            window.location.href = 'book-list.html';
+        }
+        else{
+            console.log(response);
+            alert('Invalid login or password');
+        }
+    }
+</script>
+</html>

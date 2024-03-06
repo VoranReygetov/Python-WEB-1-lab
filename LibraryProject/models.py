@@ -24,12 +24,12 @@ class Authors(Base):
 class Categories(Base):
     __tablename__ = "Categories"
     id = Column(Integer, primary_key=True, index=True)
-    nameCategories = Column(String)
+    nameCategories = Column(String, nullable=False)
 
 class Books(Base):
     __tablename__ ="Books"
     id = Column(Integer, primary_key=True, index=True)
-    nameBook = Column(String)
+    nameBook = Column(String, nullable=False)
     yearBook = Column(Integer)
     availableBook = Column(Integer)
     category_id = Column(Integer, ForeignKey("Categories.id"))
@@ -38,23 +38,23 @@ class Books(Base):
 class User(Base):
     __tablename__ ="Users"
     id = Column(Integer, primary_key=True, index=True)
-    nameUser = Column(String)
+    nameUser = Column(String, nullable=False)
     surnameUser = Column(String)
-    passwordUser = Column(String)
+    passwordUser = Column(String, nullable=False)
     is_admin = Column(Boolean, default= False)
-    emailUser = Column(String)
+    emailUser = Column(String, nullable=False)
     numberUser = Column(Integer)
 
 class History(Base):
     __tablename__ ="History"
     id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("Users.id"))
-    books_id = Column(Integer, ForeignKey("Books.id"))
-    dateLoan = Column(DateTime)
+    user_id = Column(Integer, ForeignKey("Users.id"), nullable=False)
+    books_id = Column(Integer, ForeignKey("Books.id"), nullable=False)
+    dateLoan = Column(DateTime, nullable=False)
     dateReturn = Column(DateTime)
     isReturned = Column(Boolean, default= False)
 
     #table
-
+    
 SessionLocal = sessionmaker(autoflush=False, bind=engine)
 
