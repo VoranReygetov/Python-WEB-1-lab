@@ -6,6 +6,24 @@
     <title>Test variant for index page</title>
 </head>
 <body>
-    <h1>Index page</h1>
+    <h1>Log In</h1>
+    <div id="message"></div>
+    <p>
+        Input Login: <br />
+        <input id="userlogin" />
+    </p>
+    <p>
+        Input Password: <br />
+        <input id="userpassword"/>
+    </p>
+    <button onclick="send()">Submit</button>
+
+    
 </body>
+<script>
+    function send(){
+        let login = document.getElementById("userlogin").value;
+        let password = document.getElementById("userpassword").value;
+    }
+</script>
 </html>

@@ -1,7 +1,8 @@
 from datetime import datetime
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import Boolean, DateTime, create_engine
-from sqlalchemy.ext.declarative import declarative_base
+# from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import declarative_base
 from sqlalchemy import Column, Integer, String, ForeignKey
 
 from fastapi import FastAPI
@@ -39,7 +40,7 @@ class User(Base):
     id = Column(Integer, primary_key=True, index=True)
     nameUser = Column(String)
     surnameUser = Column(String)
-    adressUser = Column(String)
+    passwordUser = Column(String)
     is_admin = Column(Boolean, default= False)
     emailUser = Column(String)
     numberUser = Column(Integer)
