@@ -1,7 +1,7 @@
 from sqlalchemy.orm import sessionmaker
 from models import *
 from fastapi import Depends, FastAPI, Body
-from fastapi.responses import JSONResponse, FileResponse
+from fastapi.responses import JSONResponse, FileResponse, RedirectResponse
 
 Base.metadata.create_all(bind=engine)
 app = FastAPI()     #uvicorn main:app --reload
