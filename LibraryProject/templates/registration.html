@@ -41,8 +41,7 @@
         const userpassword = document.getElementById("password").value;
         const userfirstname = document.getElementById("firstName").value;
         const userlastname = document.getElementById("lastName").value;        
-        const userphone = document.getElementById("phoneNumber").value;
-        
+        const userphone = document.getElementById("phoneNumber").value;      
         // Create a JavaScript object with the user data
         const userData = {
             nameUser: userfirstname,
@@ -51,9 +50,8 @@
             emailUser: useremail,
             numberUser: userphone
         };
-
         // Send a POST request to the server
-        const response = await fetch("registration", {
+        const response = await fetch("/registration", {
             method: "POST",
             headers: {
                 "Accept": "application/json",
@@ -61,7 +59,7 @@
             },
             body: JSON.stringify(userData)
         });
-
+        console.log(response)
         if (response.ok) {
             const data = await response.json()
             document.getElementById("message").textContent = data.message;
