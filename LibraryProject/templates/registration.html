@@ -10,7 +10,7 @@
     <div id="message"></div>
     <div class="container mt-4">
         <h1>Registration</h1>
-        <form>
+        <form id="form">
             <div class="form-group mb-3">
                 <label for="email" class="form-label">Email:</label>
                 <input type="email" class="form-control" id="email" name="email" required>
@@ -18,7 +18,7 @@
             <div class="form-group mb-3">
                 <label for="password" class="form-label">Password:</label>
                 <input type="password" class="form-control" id="password" name="password" required>
-            </div>            
+            </div>
             <div class="form-group mb-3">
                 <label for="firstName" class="form-label">First Name:</label>
                 <input type="text" class="form-control" id="firstName" name="firstName" required>
@@ -31,45 +31,49 @@
                 <label for="phoneNumber" class="form-label">Phone Number:</label>
                 <input type="tel" class="form-control" id="phoneNumber" name="phoneNumber">
             </div>
-            <button class="btn btn-primary" onclick="send()">Submit</button>
+                <button class="btn btn-primary submit-btn">Submit</button>
             </form>
         </div>
 <script>
-    async function send() {
-        // Get the values from the input fields
-        const useremail = document.getElementById("email").value;
-        const userpassword = document.getElementById("password").value;
-        const userfirstname = document.getElementById("firstName").value;
-        const userlastname = document.getElementById("lastName").value;        
-        const userphone = document.getElementById("phoneNumber").value;      
-        // Create a JavaScript object with the user data
-        const userData = {
-            nameUser: userfirstname,
-            surnameUser: userlastname,
-            passwordUser: userpassword,
-            emailUser: useremail,
-            numberUser: userphone
-        };
-        // Send a POST request to the server
-        const response = await fetch("/registration", {
-            method: "POST",
-            headers: {
-                "Accept": "application/json",
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(userData)
-        });
-        console.log(response)
-        if (response.ok) {
-            const data = await response.json()
-            document.getElementById("message").textContent = data.message;
-        } else {
-            const error = await response.json();
-            console.log(error.message);
-        }
-    }
-</script>
 
+const form = document.getElementById("form");
+
+form.addEventListener("submit", async (event) => {
+    event.preventDefault()
+    // Get the values from the input fields
+    const useremail = document.getElementById("email").value;
+    const userpassword = document.getElementById("password").value;
+    const userfirstname = document.getElementById("firstName").value;
+    const userlastname = document.getElementById("lastName").value;
+    const userphone = document.getElementById("phoneNumber").value;
+    // Create a JavaScript object with the user data
+    const userData = {
+        nameUser: userfirstname,
+        surnameUser: userlastname,
+        passwordUser: userpassword,
+        emailUser: useremail,
+        numberUser: userphone
+    };
+    // Send a POST request to the server
+    const response = await fetch("/registration", {
+        method: "POST",
+        headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(userData)
+    });
+    console.log(response)
+    if (response.ok) {
+        const data = await response.json()
+        window.location.href = "book-list";
+        document.getElementById("message").textContent = data.message;
+    } else {
+        const error = await response.json();
+        console.log(error.message);
+    }
+})
+</script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>
