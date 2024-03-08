@@ -46,7 +46,7 @@ def book_list_page(db: Books = Depends(get_db)):
     return HTMLResponse(output)
 
 @app.post("/book-list")
-def book_list_page(data = Body(), db: Books = Depends(get_db)):
+def book_post_page(data = Body(), db: Books = Depends(get_db)):
     book = Books(id=data["id"], nameBook=data["nameBook"],
                   yearBook=data["yearBook"],availableBook=data["availableBook"],category_id=data["category_id"],
                   author_id=data["author_id"])
@@ -56,7 +56,7 @@ def book_list_page(data = Body(), db: Books = Depends(get_db)):
     return book
 
 @app.post("/authors")
-def book_list_page(data = Body(), db: Authors = Depends(get_db)):
+def authors_post_page(data = Body(), db: Authors = Depends(get_db)):
     author = Authors(id=data["id"], nameAuthor=data["nameAuthor"],
                   surnameAuthor=data["surnameAuthor"])
     db.add(author)
@@ -65,7 +65,7 @@ def book_list_page(data = Body(), db: Authors = Depends(get_db)):
     return author
 
 @app.post("/categoies")
-def book_list_page(data = Body(), db: Categories = Depends(get_db)):
+def categories_post_page(data = Body(), db: Categories = Depends(get_db)):
     category = Categories(id=data["id"], nameCategories=data["nameCategories"])
     db.add(category)
     db.commit()
