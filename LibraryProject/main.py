@@ -18,13 +18,19 @@ def get_db():
         db.close()
 
 
-@app.get("/")
+@app.get("/login")
 def main():
     return FileResponse("templates/login.html")
 
-@app.post("/")
-def main():
-    return FileResponse("templates/login.html")
+@app.post("/login")
+def login(data = Body(), db: User = Depends(get_db)):
+    user = User(emailUser=data["emailUser"], passwordUser=data["passwordUser"])
+    searched_user = User.query.filter_by(emailUser=user.emailUser, passwordUser=user.passwordUser).first
+    if searched_user:
+        return {"message": "Login successful"}
+    else:
+        return {"message": "Login failed"}
+        
 
 @app.get("/registration")
 def register_page():
