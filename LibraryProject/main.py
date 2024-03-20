@@ -1,6 +1,6 @@
 from sqlalchemy.orm import sessionmaker
 from models import *
-from fastapi import Depends, FastAPI, Body
+from fastapi import Depends, FastAPI, Body, Cookie
 from fastapi.responses import JSONResponse, FileResponse, RedirectResponse, HTMLResponse
 from jinja2 import Environment, FileSystemLoader
 
@@ -19,17 +19,24 @@ def get_db():
 
 
 @app.get("/login")
-def main():
-    return FileResponse("templates/login.html")
+def get_login_data(last_visit: str | None = Cookie(default=None)):
+    if(last_visit==None):
+        return FileResponse("templates/login.html")
+    else:
+        return FileResponse("templates/book-list.html")
 
 @app.post("/login")
 def login(data = Body(), db: User = Depends(get_db)):
-    user = User(emailUser=data["emailUser"], passwordUser=data["passwordUser"])
-    searched_user = User.query.filter_by(emailUser=user.emailUser, passwordUser=user.passwordUser).first
-    if searched_user:
-        return {"message": "Login successful"}
-    else:
-        return {"message": "Login failed"}
+    now = datetime.now()
+    user = create_user()
+    response = JSONResponse(content=create_user.emailUser)
+    #searched_user = User.query.filter_by(emailUser=user.emailUser, passwordUser=user.passwordUser).first
+    #if searched_user:
+    #    return {"message": "Login successful"}
+    #else:
+    #    return {"message": "Login failed"}
+    response.set_cookie(key="last_visit", value=now)
+    return response
         
 
 @app.get("/registration")
