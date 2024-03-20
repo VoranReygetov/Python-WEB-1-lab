@@ -16,8 +16,8 @@
                     <th>Name</th>
                     <th>Year</th>
                     <th>Available</th>
-                    <th>Category ID</th>
-                    <th>Author ID</th>
+                    <th>Category</th>
+                    <th>Author</th>
                 </tr>
             </thead>
             <tbody>
@@ -28,8 +28,8 @@
                         <td>{{ book.nameBook }}</td>
                         <td>{{ book.yearBook }}</td>
                         <td>{{ book.availableBook }}</td>
-                        <td>{{ book.category_id }}</td>
-                        <td>{{ book.author_id }}</td>
+                        <td>{{ book.categories.nameCategory }}</td>
+                        <td>{{ book.author.nameAuthor }}</td>
                     </tr>
                 {% endfor %}
                 {% endblock %}

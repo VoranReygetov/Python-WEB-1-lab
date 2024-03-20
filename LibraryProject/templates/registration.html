@@ -9,7 +9,7 @@
 <body>
     <main>
         <div class="d-flex align-items-center justify-content-center">
-            <div id="message"></div>
+            <div class="alert alert-danger" role="alert" id="message"></div>
             <div class="p-2 m-2 bg-light text-black shadow rounded-2">
                 <h1>Registration</h1>
                 <form id="form">
@@ -70,9 +70,11 @@ form.addEventListener("submit", async (event) => {
     console.log(response)
     if (response.ok) {
         const data = await response.json()
+        alertDiv.style.display = 'none';
         window.location.href = "book-list";        
     } else {
         const error = await response.json();
+        alertDiv.style.display = 'block';
         document.getElementById("message").textContent = data.detail;
         console.log(error.message);
     }

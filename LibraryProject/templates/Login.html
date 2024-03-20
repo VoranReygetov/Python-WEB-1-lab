@@ -11,7 +11,7 @@
         <div class="d-flex align-items-center justify-content-center">
             <div class="p-2 m-2 bg-light text-black shadow rounded-2">
                 <form id="form">
-                    <div id="message"></div>
+                    <div class="alert alert-danger" role="alert" id="message"></div>
                     <h1>Log In</h1>
                     <div class="form-group mb-3">
                         <label for="email" class="form-label">Email:</label>
@@ -28,8 +28,10 @@
     </main>
 </body>
 <script>
+    const alertDiv = document.getElementById('message');
+    alertDiv.style.display = 'none';
+
     const form = document.getElementById("form");
-    
     form.addEventListener("submit", async (event) => {
         event.preventDefault()
         // Get the values from the input fields
@@ -52,10 +54,12 @@
         console.log(response)
         if (response.ok) {
             const data = await response.json()
+            alertDiv.style.display = 'none';
             window.location.href = "book-list";
         } else {
             const error = await response.json();
             document.getElementById("message").textContent = error.detail;
+            alertDiv.style.display = 'block';
             console.log(error.detail);
         }
     })
