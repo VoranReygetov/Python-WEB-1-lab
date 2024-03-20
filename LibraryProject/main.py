@@ -1,6 +1,6 @@
 from sqlalchemy.orm import sessionmaker
 from models import *
-from fastapi import Depends, FastAPI, Body
+from fastapi import Depends, FastAPI, Body, HTTPException, status
 from fastapi.responses import JSONResponse, FileResponse, RedirectResponse, HTMLResponse
 from jinja2 import Environment, FileSystemLoader
 
@@ -17,14 +17,23 @@ def get_db():
     finally:
         db.close()
 
-
 @app.get("/")
 def main():
-    return FileResponse("templates/login.html")
+    return RedirectResponse("/login")
 
-@app.post("/")
+@app.get("/login")
 def main():
     return FileResponse("templates/login.html")
+
+@app.post("/login")
+def login(data = Body(), db: User = Depends(get_db)):
+    email = data.get("emailUser")
+    password = data.get("passwordUser")
+    searched_user = db.query(User).filter_by(emailUser=email).first()
+    if searched_user and searched_user.passwordUser == password:
+        return searched_user
+    else:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Login failed")
 
 @app.get("/registration")
 def register_page():

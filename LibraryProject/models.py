@@ -42,7 +42,7 @@ class User(Base):
     surnameUser = Column(String)
     passwordUser = Column(String, nullable=False)
     is_admin = Column(Boolean, default= False)
-    emailUser = Column(String, nullable=False)
+    emailUser = Column(String, nullable=False, unique=True)
     numberUser = Column(Integer)
 
 class History(Base):
