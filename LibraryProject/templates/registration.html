@@ -9,9 +9,9 @@
 <body>
     <main>
         <div class="d-flex align-items-center justify-content-center">
-            <div class="alert alert-danger" role="alert" id="message"></div>
             <div class="p-2 m-2 bg-light text-black shadow rounded-2">
                 <h1>Registration</h1>
+                <div class="alert alert-danger" role="alert" id="message"></div>
                 <form id="form">
                     <div class="form-group mb-3">
                         <label for="email" class="form-label">Email:</label>
@@ -34,6 +34,7 @@
                         <input type="tel" class="form-control" id="phoneNumber" name="phoneNumber">
                     </div>
                         <button class="btn btn-primary submit-btn">Submit</button>
+                        <a href="/login" class="btn btn-secondary">Log In</a>
                 </form>
             </div>
         </div>
@@ -41,6 +42,8 @@
     
 <script>
 const form = document.getElementById("form");
+const alertDiv = document.getElementById('message');
+alertDiv.style.display = 'none';
 
 form.addEventListener("submit", async (event) => {
     event.preventDefault()
@@ -75,7 +78,7 @@ form.addEventListener("submit", async (event) => {
     } else {
         const error = await response.json();
         alertDiv.style.display = 'block';
-        document.getElementById("message").textContent = data.detail;
+        alertDiv.textContent = error.detail;
         console.log(error.message);
     }
 })

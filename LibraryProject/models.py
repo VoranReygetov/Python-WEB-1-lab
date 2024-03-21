@@ -50,6 +50,9 @@ class User(Base):
     emailUser = Column(String, nullable=False, unique=True)
     numberUser = Column(Integer)
     histories = relationship("History", back_populates="user")
+    def check_password(self, password):
+        if (self.passwordUser == password):
+            return True
 
 
 class History(Base):
