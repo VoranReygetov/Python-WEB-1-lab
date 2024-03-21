@@ -49,13 +49,84 @@ def create_user(data = Body(), db: Session = Depends(get_db)):
     return user
 
 @app.get("/book-list")
-def book_list_page(db: Book = Depends(get_db)):
+def book_list_page(db: Session = Depends(get_db)):
     book_list_page = env.get_template('book-list.html')
     output = book_list_page.render(books=db.query(Book).all())
     return HTMLResponse(output)
 
+@app.get("/book/{book_id}")
+def book_list_page(book_id, db: Session = Depends(get_db)):
+    book =  db.query(Book).filter(Book.id == book_id).first()     # якщо не знайдений, відправляємо статусний код і повідомлення про помилку
+    if book==None:
+        return JSONResponse(status_code=404, content={ "message": "Книжка не знайдена"})        #якщо користувача знайдено, відправляємо його
+    return book
+
+@app.post("/book")
+def book_post_page(book_data = Body(), db: Session = Depends(get_db)):
+    book = Book(
+        nameBook=book_data.get("nameBook"),
+        yearBook=book_data.get("yearBook"),
+        availableBook=book_data.get("availableBook"),
+        category_id=book_data.get("category_id"),
+        author_id=book_data.get("author_id")
+    )
+    db.add(book)
+    db.commit()
+    db.refresh(book)
+    return book
+
+@app.put("/book")
+def edit_person(data = Body(), db: Session = Depends(get_db)):
+    # отримуємо користувача за id
+    book = db.query(Book).filter(Book.id == data["id"]).first()
+    # якщо не знайдений, відправляємо статусний код і повідомлення про помилку
+    if book == None:
+        return JSONResponse(status_code=404, content={ "message": "Книжка не знайдена"})
+    # якщо користувач знайдений, змінюємо його дані і відправляємо назад клієнту
+    book.nameBook = data["nameBook"]
+    book.yearBook = data["yearBook"]
+    book.availableBook =  data["availableBook"]
+    book.category_id =  data["category_id"]
+    book.author_id =  data["author_id"]
+    db.commit() # зберігаємо зміни
+    db.refresh(book)
+    return book
+
+@app.delete("/book/{book_id}")
+def delete_person(book_id, db: Session = Depends(get_db)):
+    # отримуємо користувача за id
+    book = db.query(Book).filter(Book.id == book_id).first()
+    # якщо не знайдений, відправляємо статусний код і повідомлення про помилку
+    if book == None:
+        return JSONResponse( status_code=404, content={ "message": "Книжка не знайдена"})
+    # якщо користувача знайдено, видаляємо його
+    db.delete(book) # видаляємо об'єкт
+    db.commit() # зберігаємо зміни
+    return book
+
+@app.post("/authors")
+def authors_post_page(data: dict = Body(...), db: Session = Depends(get_db)):
+    for category_data in data:
+        nameAuthor = category_data.get("nameAuthor")
+        surnameAuthor = category_data.get("surnameAuthor")
+        author = Author(nameAuthor=nameAuthor, surnameAuthor = surnameAuthor)
+        db.add(author)
+    db.commit()
+    db.refresh(author)
+    return db.query(Author).all()
+
+@app.post("/categories")
+def categories_post_page(data: dict = Body(...), db: Session = Depends(get_db)):
+    for category_data in data:
+        category_name = category_data.get("nameCategory")
+        category = Category(nameCategory=category_name)
+        db.add(category)
+    db.commit()
+    db.refresh(category)
+    return db.query(Category).all()
+
 @app.post("/book-list")
-def book_post_page(data = Body(), db: Session = Depends(get_db)):
+def book_post_page(data: dict = Body(...), db: Session = Depends(get_db)):
     for book_data in data:
         book = Book(
             nameBook=book_data.get("nameBook"),
@@ -67,24 +138,3 @@ def book_post_page(data = Body(), db: Session = Depends(get_db)):
         db.add(book)
     db.commit()
     return db.query(Book).all()
-    
-@app.post("/authors")
-def authors_post_page(data = Body(), db: Session = Depends(get_db)):
-    for category_data in data:
-        nameAuthor = category_data.get("nameAuthor")
-        surnameAuthor = category_data.get("surnameAuthor")
-        author = Author(nameAuthor=nameAuthor, surnameAuthor = surnameAuthor)
-        db.add(author)
-    db.commit()
-    db.refresh(author)
-    return db.query(Author).all()
-
-@app.post("/categories")
-def categories_post_page(data = Body(), db: Session = Depends(get_db)):
-    for category_data in data:
-        category_name = category_data.get("nameCategory")
-        category = Category(nameCategory=category_name)
-        db.add(category)
-    db.commit()
-    db.refresh(category)
-    return db.query(Category).all()
