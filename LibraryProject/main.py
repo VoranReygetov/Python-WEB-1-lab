@@ -3,12 +3,33 @@ from models import *
 from fastapi import Depends, FastAPI, Body, HTTPException, status, Response, Cookie
 from fastapi.responses import JSONResponse, FileResponse, RedirectResponse, HTMLResponse
 from jinja2 import Environment, FileSystemLoader
+from pydantic import BaseModel
+from fastapi.openapi.utils import get_openapi
 
 file_loader = FileSystemLoader('templates')
 env = Environment(loader=file_loader)
 
 Base.metadata.create_all(bind=engine)
-app = FastAPI()     #uvicorn main:app --reload
+app = FastAPI(swagger_ui_parameters={"syntaxHighlight.theme": "obsidian"})     #uvicorn main:app --reload
+
+def custom_openapi():
+    if app.openapi_schema:
+        return app.openapi_schema
+    openapi_schema = get_openapi(
+        title="Library API",
+        version="2.2.9",
+        summary="This is a very cool Library schema.",
+        description="It has a rent function, post method's for all Tables, and Authorisation with Auntification.",
+        routes=app.routes,
+    )
+    openapi_schema["info"]["x-logo"] = {
+        "url": "https://static.vecteezy.com/system/resources/previews/004/852/937/large_2x/book-read-library-study-line-icon-illustration-logo-template-suitable-for-many-purposes-free-vector.jpg"
+    }
+    app.openapi_schema = openapi_schema
+    return app.openapi_schema
+
+
+app.openapi = custom_openapi
 
 def get_db():
     db = SessionLocal()
@@ -17,7 +38,7 @@ def get_db():
     finally:
         db.close()
 
-@app.get("/")
+@app.get("/", summary="Redirect to login page")
 def main():
     return RedirectResponse("/login")
 
@@ -27,14 +48,14 @@ def authenticate_user(db: Session, email: str, password: str):
         return searched_user
     return None
 
-@app.get("/login")
+@app.get("/login", summary="Login page")
 def login_get(email: str| None = Cookie(default=None), password: str | None = Cookie(default=None), db: Session = Depends(get_db)):
     user = authenticate_user(db, email, password)
     if user:
         return RedirectResponse("/book-list")
     return FileResponse("templates/login.html")
     
-@app.post("/login")
+@app.post("/login", summary="Post method for LogIn")
 def login(data = Body(), db: Session = Depends(get_db)):
     email = data.get("emailUser")
     password = data.get("passwordUser")
@@ -50,11 +71,11 @@ def login(data = Body(), db: Session = Depends(get_db)):
     except:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Login failed")
 
-@app.get("/registration")
+@app.get("/registration", summary="Registration page")
 def register_page():
     return FileResponse("templates/registration.html")
 
-@app.post("/registration")
+@app.post("/registration", summary="Post method for Registration")
 def create_user(data = Body(), db: Session = Depends(get_db)):
     user = User(nameUser=data["nameUser"], surnameUser=data["surnameUser"],
                   passwordUser=data["passwordUser"],emailUser=data["emailUser"],numberUser=data["numberUser"])
@@ -69,7 +90,7 @@ def create_user(data = Body(), db: Session = Depends(get_db)):
     response.set_cookie(key="password", value=data.get("passwordUser"))
     return response
 
-@app.get("/book-list")
+@app.get("/book-list", summary="Books view in library")
 def book_list_page(
     db: Session = Depends(get_db),
     email: str | None = Cookie(default=None),
@@ -98,18 +119,18 @@ def render_book_list(db: Session, email: str, password: str):
         rents_book_id = [rent.books_id for rent in db.query(History).filter(
             History.user_id == user.id,
             History.isReturned == False
-        ).all()] 
+        ).all()]
     )
     return output
 
-@app.get("/book/{book_id}")
+@app.get("/book/{book_id}", summary="Get for getting one specific book")
 def book_page(book_id, db: Session = Depends(get_db)):
     book =  db.query(Book).filter(Book.id == book_id).first()     # якщо не знайдений, відправляємо статусний код і повідомлення про помилку
     if book==None:
         return JSONResponse(status_code=404, content={ "message": "Книжка не знайдена"})        #якщо користувача знайдено, відправляємо його
     return book
 
-@app.post("/book")
+@app.post("/book", summary="Post method for Book")
 def book_post_page(email: str| None = Cookie(default=None), password: str | None = Cookie(default=None), book_data = Body(), db: Session = Depends(get_db)):
     book = Book(
         nameBook=book_data.get("nameBook"),
@@ -126,7 +147,7 @@ def book_post_page(email: str| None = Cookie(default=None), password: str | None
         return book
     else:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Authorization failed")
-@app.put("/book")
+@app.put("/book", summary="Put method for Book")
 def edit_book(email: str| None = Cookie(default=None), password: str | None = Cookie(default=None), data = Body(), db: Session = Depends(get_db)):
     user = authenticate_user(db, email, password)
     if not user.is_admin:
@@ -146,7 +167,7 @@ def edit_book(email: str| None = Cookie(default=None), password: str | None = Co
     db.refresh(book)
     return book
 
-@app.delete("/book/{book_id}")
+@app.delete("/book/{book_id}", summary="Delete method for Book")
 def delete_book(book_id, email: str| None = Cookie(default=None), password: str | None = Cookie(default=None),  db: Session = Depends(get_db)):
     user = authenticate_user(db, email, password)
     if not user.is_admin:
@@ -161,7 +182,7 @@ def delete_book(book_id, email: str| None = Cookie(default=None), password: str 
     db.commit() # зберігаємо зміни
     return book
 
-@app.post("/book/{book_id}/rent")
+@app.post("/book/{book_id}/rent", summary="Renting a book")
 def rent_book(
     book_id,
     email: str | None = Cookie(default=None),
@@ -203,7 +224,7 @@ def rent_book(
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
 
-@app.get("/rents-list")
+@app.get("/rents-list", summary="List of Rents")
 def book_list_page(
     db: Session = Depends(get_db),
     email: str | None = Cookie(default=None),
@@ -228,7 +249,7 @@ def render_rent_list(db: Session, email: str, password: str):
        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Authorization failed")
     return output
 
-@app.post("/authors")
+@app.post("/authors", summary="Post method for Authors")
 def authors_post_page(data: dict = Body(...), db: Session = Depends(get_db)):
     for category_data in data:
         nameAuthor = category_data.get("nameAuthor")
@@ -239,7 +260,7 @@ def authors_post_page(data: dict = Body(...), db: Session = Depends(get_db)):
     db.refresh(author)
     return db.query(Author).all()
 
-@app.post("/categories")
+@app.post("/categories", summary="Post method for Categories")
 def categories_post_page(data: dict = Body(...), db: Session = Depends(get_db)):
     for category_data in data:
         category_name = category_data.get("nameCategory")
@@ -249,7 +270,7 @@ def categories_post_page(data: dict = Body(...), db: Session = Depends(get_db)):
     db.refresh(category)
     return db.query(Category).all()
 
-@app.post("/book-list")
+@app.post("/book-list", summary="Post method for Books")
 def books_post_page(data: dict = Body(...), db: Session = Depends(get_db)):
     for book_data in data:
         book = Book(
@@ -263,7 +284,7 @@ def books_post_page(data: dict = Body(...), db: Session = Depends(get_db)):
     db.commit()
     return db.query(Book).all()
 
-@app.get("/clear-cookie")
+@app.get("/clear-cookie", summary="Clearing Cookies")
 def clear_cookie(response: Response):
     response.delete_cookie("email")
     response.delete_cookie("password")
