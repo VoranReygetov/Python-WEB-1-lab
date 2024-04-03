@@ -27,8 +27,6 @@ def custom_openapi():
     }
     app.openapi_schema = openapi_schema
     return app.openapi_schema
-
-
 app.openapi = custom_openapi
 
 def get_db():
@@ -189,7 +187,7 @@ def rent_book(
     password: str | None = Cookie(default=None),
     db: Session = Depends(get_db)
 ):
-    date = datetime.now()
+    date_now = datetime.now()
     user = authenticate_user(db, email, password)
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Authentication failed")
@@ -201,9 +199,9 @@ def rent_book(
             History.books_id == book_id
         ).first()
     book = db.query(Book).get(book_id)
-    if rent:        #not returned rental rec
+    if rent:        #returned == False rental rec
         rent.isReturned = True
-        rent.dateReturn = date
+        rent.dateReturn = date_now
         book.availableBook += 1
         db.commit() # зберігаємо зміни
         db.refresh(rent)
@@ -211,7 +209,7 @@ def rent_book(
         return book
     else:       #creating a new rental rec
         # Create new rental record
-        rent = History(user_id=user.id, books_id=book_id, dateLoan=date, isReturned=False)
+        rent = History(user_id=user.id, books_id=book_id, dateLoan=date_now, isReturned=False)
         try:
             book.availableBook -= 1
             db.add(rent)
