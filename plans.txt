@@ -1,0 +1,85 @@
+library-rental-system/
+│
+├── backend/
+│   ├── alembic/                # Alembic migration files
+│   │   ├── versions/           # Migration scripts
+│   │   └── env.py
+│   │
+│   ├── app/
+│   │   ├── api/                # FastAPI routes
+│   │   │   ├── books.py
+│   │   │   ├── users.py
+│   │   │   ├── rentals.py
+│   │   │   └── __init__.py
+│   │   │
+│   │   ├── core/               # Configs & utils
+│   │   │   ├── config.py       # Settings (DB URL, email, etc.)
+│   │   │   ├── email.py        # Email sending logic (SMTP)
+│   │   │   └── tasks.py        # Background task helpers
+│   │   │
+│   │   ├── db/                 
+│   │   │   ├── session.py      # SQLAlchemy session
+│   │   │   ├── base.py         # Declarative Base
+│   │   │   └── init_db.py      # Optional seed
+│   │   │
+│   │   ├── models/             # SQLAlchemy models
+│   │   │   ├── book.py
+│   │   │   ├── user.py
+│   │   │   ├── rental.py
+│   │   │   └── __init__.py
+│   │   │
+│   │   ├── schemas/            # Pydantic models
+│   │   │   ├── book.py
+│   │   │   ├── user.py
+│   │   │   ├── rental.py
+│   │   │   └── __init__.py
+│   │   │
+│   │   ├── services/           
+│   │   │   ├── auth_service.py    # user authentication
+│   │   │   ├── rental_service.py  # rent/return logic
+│   │   │   ├── reminder_service.py# background reminders
+│   │   │   └── __init__.py
+│   │   │
+│   │   ├── main.py             # FastAPI app entrypoint
+│   │   └── __init__.py
+│   │
+│   ├── tests/                  # Pytest tests
+│   │   ├── test_books.py
+│   │   ├── test_rentals.py
+│   │   └── __init__.py
+│   │
+│   ├── requirements.txt
+│   └── alembic.ini
+│
+├── frontend/
+│   ├── public/
+│   ├── src/
+│   │   ├── api/                # Axios API calls
+│   │   │   ├── books.js
+│   │   │   ├── users.js
+│   │   │   └── rentals.js
+│   │   │
+│   │   ├── components/         # Reusable UI
+│   │   │   ├── BookCard.js
+│   │   │   ├── RentalForm.js
+│   │   │   └── ReminderList.js
+│   │   │
+│   │   ├── pages/              # Page views
+│   │   │   ├── Home.js
+│   │   │   ├── Books.js
+│   │   │   ├── Rentals.js
+│   │   │   └── Login.js
+│   │   │
+│   │   ├── App.js
+│   │   └── index.js
+│   │
+│   ├── package.json
+│   └── jsconfig.json
+│
+└── docker-compose.yml          # (Optional: DB + backend + frontend)
+
+User rents a book → Rental created with due_date.
+
+Background task (FastAPI BackgroundTasks) checks rentals daily.
+
+If due_date is near (e.g., 2 days before), send email via SMTP.
