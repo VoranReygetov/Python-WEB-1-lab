@@ -1,0 +1,7 @@
+from sqlalchemy.orm import DeclarativeBase, declared_attr
+
+class Base(DeclarativeBase):
+    # Ensures table names default to lowercase class names
+    @declared_attr.directive
+    def __tablename__(cls) -> str:
+        return cls.__name__.lower()
