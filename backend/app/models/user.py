@@ -3,7 +3,7 @@ from typing import Optional
 from sqlalchemy import String, Boolean
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column
-from fastapi_users.db import SQLAlchemyBaseUserTableUUID
+from fastapi_users.db import SQLAlchemyBaseUserTableUUID, SQLAlchemyUserDatabase
 from app.db.base import Base
 
 class User(SQLAlchemyBaseUserTableUUID, Base):

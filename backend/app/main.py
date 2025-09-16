@@ -29,16 +29,9 @@ def custom_openapi():
     return app.openapi_schema
 app.openapi = custom_openapi
 
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-
-@app.get("/", summary="Redirect to login page")
-def main():
-    return RedirectResponse("/login")
+# @app.get("/", summary="Redirect to login page")
+# def main():
+#     return RedirectResponse("/login")
 
 def authenticate_user(db: Session, email: str, password: str):
     searched_user = db.query(User).filter_by(emailUser=email).first()
@@ -46,12 +39,12 @@ def authenticate_user(db: Session, email: str, password: str):
         return searched_user
     return None
 
-@app.get("/login", summary="Login page")
-def login_get(email: str| None = Cookie(default=None), password: str | None = Cookie(default=None), db: Session = Depends(get_db)):
-    user = authenticate_user(db, email, password)
-    if user:
-        return RedirectResponse("/book-list")
-    return FileResponse("templates/login.html")
+# @app.get("/login", summary="Login page")
+# def login_get(email: str| None = Cookie(default=None), password: str | None = Cookie(default=None), db: Session = Depends(get_db)):
+#     user = authenticate_user(db, email, password)
+#     if user:
+#         return RedirectResponse("/book-list")
+#     return FileResponse("templates/login.html")
     
 @app.post("/login", summary="Post method for LogIn")
 def login(data = Body(), db: Session = Depends(get_db)):
@@ -69,9 +62,9 @@ def login(data = Body(), db: Session = Depends(get_db)):
     except:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Login failed")
 
-@app.get("/registration", summary="Registration page")
-def register_page():
-    return FileResponse("templates/registration.html")
+# @app.get("/registration", summary="Registration page")
+# def register_page():
+#     return FileResponse("templates/registration.html")
 
 @app.post("/registration", summary="Post method for Registration")
 def create_user(data = Body(), db: Session = Depends(get_db)):
@@ -145,6 +138,8 @@ def book_post_page(email: str| None = Cookie(default=None), password: str | None
         return book
     else:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Authorization failed")
+
+
 @app.put("/book", summary="Put method for Book")
 def edit_book(email: str| None = Cookie(default=None), password: str | None = Cookie(default=None), data = Body(), db: Session = Depends(get_db)):
     user = authenticate_user(db, email, password)
@@ -165,6 +160,7 @@ def edit_book(email: str| None = Cookie(default=None), password: str | None = Co
     db.refresh(book)
     return book
 
+
 @app.delete("/book/{book_id}", summary="Delete method for Book")
 def delete_book(book_id, email: str| None = Cookie(default=None), password: str | None = Cookie(default=None),  db: Session = Depends(get_db)):
     user = authenticate_user(db, email, password)
@@ -179,6 +175,7 @@ def delete_book(book_id, email: str| None = Cookie(default=None), password: str 
     db.delete(book) # видаляємо об'єкт
     db.commit() # зберігаємо зміни
     return book
+
 
 @app.post("/book/{book_id}/rent", summary="Renting a book")
 def rent_book(
@@ -235,6 +232,7 @@ def book_list_page(
     else:
         return RedirectResponse("/login")
 
+
 def render_rent_list(db: Session, email: str, password: str):
     user = authenticate_user(db, email, password)
     if user.is_admin:
@@ -246,6 +244,7 @@ def render_rent_list(db: Session, email: str, password: str):
     else:
        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Authorization failed")
     return output
+
 
 @app.post("/authors", summary="Post method for Authors")
 def authors_post_page(data: dict = Body(...), db: Session = Depends(get_db)):
@@ -268,6 +267,7 @@ def categories_post_page(data: dict = Body(...), db: Session = Depends(get_db)):
     db.refresh(category)
     return db.query(Category).all()
 
+
 @app.post("/book-list", summary="Post method for Books")
 def books_post_page(data: dict = Body(...), db: Session = Depends(get_db)):
     for book_data in data:
@@ -281,6 +281,7 @@ def books_post_page(data: dict = Body(...), db: Session = Depends(get_db)):
         db.add(book)
     db.commit()
     return db.query(Book).all()
+
 
 @app.get("/clear-cookie", summary="Clearing Cookies")
 def clear_cookie(response: Response):

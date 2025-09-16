@@ -1,6 +1,7 @@
 from sqlalchemy import String, Integer, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.db.base import Base
+from .rental import Rental
 
 class Author(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
